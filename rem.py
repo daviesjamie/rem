@@ -5,17 +5,24 @@ import os
 import sys
 
 
+class RootAlreadyExists(Exception):
+    def __init__(self, path):
+        super(RootAlreadyExists, self).__init__()
+        self.path = path
+
+class RootNotFound(Exception):
+    pass
+
+
 def _create_root():
-    dir_path = os.path.join(os.getcwd(), '.rem')
+    root_path = os.path.join(os.getcwd(), '.rem')
 
-    if os.path.exists(dir_path):
-        sys.stderr.write('A task file already exists in this directory!\n')
-        return
+    if os.path.exists(root_path):
+        raise RootAlreadyExists(root_path)
 
-    os.mkdir(dir_path)
-    open(os.path.join(dir_path, 'tasks'), 'a').close()
-    open(os.path.join(dir_path, 'completed'), 'a').close()
-
+    os.mkdir(root_path)
+    open(os.path.join(root_path, 'tasks'), 'a').close()
+    open(os.path.join(root_path, 'completed'), 'a').close()
 
 def _get_root_path():
     dir_path = os.getcwd()
@@ -23,7 +30,7 @@ def _get_root_path():
     while(not os.path.exists(os.path.join(dir_path, '.rem'))):
         new_path = os.path.dirname(dir_path)
         if new_path == dir_path:
-            return None
+            raise RootNotFound
 
         dir_path = os.path.dirname(dir_path)
 
@@ -33,6 +40,7 @@ def _build_parser():
     parser = argparse.ArgumentParser()
 
     # ACTIONS
+    ##########
     actions = parser.add_argument_group('Actions')
 
     # Initialise task file
@@ -48,6 +56,7 @@ def _build_parser():
     actions.add_argument('-rm', '--remove', dest='remove', metavar='TASK HASH')
 
     # OUTPUT OPTIONS
+    #################
     output = parser.add_argument_group('Output Options')
 
     # Grep for a task
@@ -67,19 +76,25 @@ def _build_parser():
 def _main():
     args, text = _build_parser().parse_known_args()
 
-    if args.init:
-        _create_root()
-    elif args.complete:
-        print 'complete', args.complete
-    elif args.remove:
-        print 'remove', args.remove
-    elif args.edit:
-        print 'edit', args.edit
-    elif text:
-        print 'new', text
-    else:
-        print 'list', args.grep, args.detailed, args.simple, args.completed
+    try:
+        if args.init:
+            _create_root()
+        elif args.complete:
+            print 'complete', args.complete
+        elif args.remove:
+            print 'remove', args.remove
+        elif args.edit:
+            print 'edit', args.edit
+        elif text:
+            print 'new', text
+        else:
+            print 'list', args.grep, args.detailed, args.simple, args.completed
 
+    except RootNotFound:
+        sys.stderr.write('Error: No task root could be found.\nTry using {0} --init first.\n'.format(sys.argv[0]))
+
+    except RootAlreadyExists, e:
+        sys.stderr.write('Error: The task root at {0} already exists!\n'.format(e.path))
 
 if __name__ == '__main__':
     _main()
