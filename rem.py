@@ -68,6 +68,13 @@ class TaskList(object):
                         if task is not None:
                             getattr(self, kind)[task['id']] = task['text']
 
+    def print_list(self,kind='tasks', grep=None, detailed=False, simple=False):
+        tasks = getattr(self, kind)
+
+        for id, task in tasks.iteritems():
+            print id, task
+
+
 def _build_parser():
     parser = argparse.ArgumentParser()
 
@@ -101,7 +108,7 @@ def _build_parser():
     output.add_argument('-s', '--simple', dest='simple', action='store_true')
 
     # List completed tasks
-    output.add_argument('--completed', dest='completed', action='store_true')
+    output.add_argument('--completed', dest='kind', action='store_const', const='completed', default='tasks')
 
     return parser
 
@@ -112,7 +119,7 @@ def _main():
         if args.init:
             _create_root()
         else:
-            tasks = TaskList()
+            task_list = TaskList()
 
             if args.complete:
                 print 'complete', args.complete
@@ -123,7 +130,7 @@ def _main():
             elif text:
                 print 'new', text
             else:
-                print 'list', args.grep, args.detailed, args.simple, args.completed
+                task_list.print_list(kind=args.kind)
 
     except RootNotFound:
         sys.stderr.write('Error: No task root could be found.\nTry using {0} --init first.\n'.format(sys.argv[0]))
