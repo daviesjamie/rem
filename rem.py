@@ -1,5 +1,17 @@
 import argparse
+import os
 import sys
+
+def _create_task_file():
+    dir_path = os.path.join(os.getcwd(), '.rem')
+
+    if os.path.exists(dir_path):
+        sys.stderr.write('A task file already exists in this directory!\n')
+        return
+
+    os.mkdir(dir_path)
+    open(os.path.join(dir_path, 'tasks'), 'a').close()
+    open(os.path.join(dir_path, 'completed'), 'a').close()
 
 
 def _build_parser():
@@ -8,7 +20,7 @@ def _build_parser():
     # ACTIONS
     actions = parser.add_argument_group('Actions')
 
-    # Initialise task list
+    # Initialise task file
     actions.add_argument('--init', dest='init')
 
     # Edit a task
@@ -47,4 +59,5 @@ def _main():
 
 
 if __name__ == '__main__':
-    _main()
+    #_main()
+    _create_task_file()
