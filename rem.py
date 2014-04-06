@@ -4,6 +4,7 @@ import argparse
 import os
 import sys
 
+
 def _create_root():
     dir_path = os.path.join(os.getcwd(), '.rem')
 
@@ -20,6 +21,10 @@ def _get_root_path():
     dir_path = os.getcwd()
 
     while(not os.path.exists(os.path.join(dir_path, '.rem'))):
+        new_path = os.path.dirname(dir_path)
+        if new_path == dir_path:
+            return None
+
         dir_path = os.path.dirname(dir_path)
 
     return os.path.join(dir_path, '.rem')
