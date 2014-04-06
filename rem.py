@@ -41,6 +41,37 @@ def _get_root_path():
 def _hash(text):
     return hashlib.sha1(text).hexdigest()
 
+def _prefixes(ids):
+    prefixes = {}
+    for id in ids:
+        id_len = len(id)
+
+        for i in range(1, id_len + 1):
+            # Finds an unused prefix, or a singular collision
+            prefix = id[:i]
+            if (not prefix in prefixes) or (prefixes[prefix] and prefix != prefixes[prefix]):
+                break
+
+        if prefix in prefixes:
+            # If there is a collision
+            other_id = prefixes[prefix]
+            for j in range(i, id_len + 1):
+                if other_id[:j] == id[:j]:
+                    prefixes[id[:j]] = ''
+                else:
+                    prefixes[other_id[:j]] = other_id
+                    prefixes[id[:j]] = id
+                    break
+        else:
+            # No collision
+            prefixes[prefix] = id
+
+    prefixes = dict(zip(prefixes.values(), prefixes.keys()))
+    if '' in prefixes:
+        del prefixes['']
+
+    return prefixes
+
 def _task_from_taskline(taskline):
     text = taskline.strip()
 
