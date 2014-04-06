@@ -1,20 +1,24 @@
 import argparse
 import sys
 
+
 def _build_parser():
     parser = argparse.ArgumentParser()
 
     # ACTIONS
     actions = parser.add_argument_group('Actions')
 
+    # Initialise task list
+    actions.add_argument('--init', dest='init')
+
     # Edit a task
-    actions.add_argument('-e', '--edit', dest='edit', metavar='TASK')
+    actions.add_argument('-e', '--edit', dest='edit', metavar='TASK HASH')
 
     # Complete a task
-    actions.add_argument('-c', '--complete', dest='complete', metavar='TASK')
+    actions.add_argument('-c', '--complete', dest='complete', metavar='TASK HASH')
 
     # Delete a task
-    actions.add_argument('-d', '--delete', '-rm', dest='delete', metavar='TASK')
+    actions.add_argument('-rm', '--remove', dest='remove', metavar='TASK HASH')
 
 
     # OUTPUT OPTIONS
@@ -36,11 +40,11 @@ def _build_parser():
     return parser
 
 
-def main():
+def _main():
     args, text = _build_parser().parse_known_args()
     print args
     print text
 
 
 if __name__ == '__main__':
-    main()
+    _main()
