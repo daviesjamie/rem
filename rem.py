@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import hashlib
 import os
 import sys
 
@@ -37,6 +38,18 @@ def _get_root_path():
 
     return os.path.join(dir_path, '.rem')
 
+def _hash(text):
+    return hashlib.sha1(text).hexdigest()
+
+def _task_from_taskline(taskline):
+    text = taskline.strip()
+
+    if text.startswith('#'):
+        return None
+
+    text = taskline.strip()
+    return { 'id': _hash(text), 'text': text }
+
 
 class TaskList(object):
     def __init__(self):
@@ -53,7 +66,7 @@ class TaskList(object):
                     tasks = map(_task_from_taskline, task_lines)
                     for task in tasks:
                         if task is not None:
-                            getattr(self, kind)[task['id']] = task
+                            getattr(self, kind)[task['id']] = task['text']
 
 def _build_parser():
     parser = argparse.ArgumentParser()
