@@ -97,13 +97,22 @@ class TaskList(object):
                     tasks = map(_task_from_taskline, task_lines)
                     for task in tasks:
                         if task is not None:
-                            getattr(self, kind)[task['id']] = task['text']
+                            getattr(self, kind)[task['id']] = task
 
-    def print_list(self,kind='tasks', grep=None, detailed=False, simple=False):
+    def print_list(self,kind='tasks', grep='', detailed=False, simple=False):
         tasks = getattr(self, kind)
+        label = 'prefix' if not detailed else 'id'
 
-        for id, task in tasks.iteritems():
-            print id, task
+        if not detailed:
+            for task_id, prefix in _prefixes(tasks).iteritems():
+                tasks[task_id]['prefix'] = prefix
+
+        label_length = max(map(lambda t: len(t[label]), tasks.values())) if tasks else 0
+
+        for _, task in sorted(tasks.iteritems()):
+            if grep.lower() in task['text'].lower():
+                l = '{0} - '.format(task[label].ljust(label_length)) if not simple else ''
+                print l + task['text']
 
 
 def _build_parser():
@@ -130,7 +139,7 @@ def _build_parser():
     output = parser.add_argument_group('Output Options')
 
     # Grep for a task
-    output.add_argument('-g', '--grep', dest='grep', metavar='SEARCH TERM(S)')
+    output.add_argument('-g', '--grep', dest='grep', metavar='SEARCH TERM(S)', default='')
 
     # Detailed task listing
     output.add_argument('-l', '--long', dest='detailed', action='store_true')
@@ -139,7 +148,7 @@ def _build_parser():
     output.add_argument('-s', '--simple', dest='simple', action='store_true')
 
     # List completed tasks
-    output.add_argument('--completed', dest='kind', action='store_const', const='completed', default='tasks')
+    output.add_argument('--completed', dest='kind', action='store_const', const='done', default='tasks')
 
     return parser
 
@@ -161,7 +170,7 @@ def _main():
             elif text:
                 print 'new', text
             else:
-                task_list.print_list(kind=args.kind)
+                task_list.print_list(kind=args.kind, grep=args.grep, detailed=args.detailed, simple=args.simple)
 
     except RootNotFound:
         sys.stderr.write('Error: No task root could be found.\nTry using {0} --init first.\n'.format(sys.argv[0]))
