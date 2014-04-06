@@ -31,7 +31,7 @@ def _build_parser():
     actions = parser.add_argument_group('Actions')
 
     # Initialise task file
-    actions.add_argument('--init', dest='init')
+    actions.add_argument('--init', dest='init', action='store_true')
 
     # Edit a task
     actions.add_argument('-e', '--edit', dest='edit', metavar='TASK HASH')
@@ -41,7 +41,6 @@ def _build_parser():
 
     # Delete a task
     actions.add_argument('-rm', '--remove', dest='remove', metavar='TASK HASH')
-
 
     # OUTPUT OPTIONS
     output = parser.add_argument_group('Output Options')
@@ -62,10 +61,12 @@ def _build_parser():
 
 def _main():
     args, text = _build_parser().parse_known_args()
-    print args
-    print text
+
+    if args.init:
+        _create_root()
+    else:
+        print _get_root_path()
 
 
 if __name__ == '__main__':
-    #_main()
-    print _get_root_path()
+    _main()
