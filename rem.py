@@ -69,8 +69,16 @@ def _main():
 
     if args.init:
         _create_root()
+    elif args.complete:
+        print 'complete', args.complete
+    elif args.remove:
+        print 'remove', args.remove
+    elif args.edit:
+        print 'edit', args.edit
+    elif text:
+        print 'new', text
     else:
-        print _get_root_path()
+        print 'list', args.grep, args.detailed, args.simple, args.completed
 
 
 if __name__ == '__main__':
