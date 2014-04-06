@@ -36,6 +36,14 @@ def _get_root_path():
 
     return os.path.join(dir_path, '.rem')
 
+
+class TaskList(object):
+    def __init__(self):
+        self.root = _get_root_path()
+        self.tasks = {}
+        self.done = {}
+
+
 def _build_parser():
     parser = argparse.ArgumentParser()
 
@@ -77,6 +85,8 @@ def _main():
     args, text = _build_parser().parse_known_args()
 
     try:
+        tasks = TaskList()
+
         if args.init:
             _create_root()
         elif args.complete:
