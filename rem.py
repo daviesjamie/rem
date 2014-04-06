@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+
 import argparse
 import os
 import sys
 
-def _create_task_file():
+def _create_root():
     dir_path = os.path.join(os.getcwd(), '.rem')
 
     if os.path.exists(dir_path):
@@ -13,6 +15,14 @@ def _create_task_file():
     open(os.path.join(dir_path, 'tasks'), 'a').close()
     open(os.path.join(dir_path, 'completed'), 'a').close()
 
+
+def _get_root_path():
+    dir_path = os.getcwd()
+
+    while(not os.path.exists(os.path.join(dir_path, '.rem'))):
+        dir_path = os.path.dirname(dir_path)
+
+    return os.path.join(dir_path, '.rem')
 
 def _build_parser():
     parser = argparse.ArgumentParser()
@@ -48,9 +58,7 @@ def _build_parser():
     # List completed tasks
     output.add_argument('--completed', dest='completed', action='store_true')
 
-
     return parser
-
 
 def _main():
     args, text = _build_parser().parse_known_args()
@@ -60,4 +68,4 @@ def _main():
 
 if __name__ == '__main__':
     #_main()
-    _create_task_file()
+    print _get_root_path()
