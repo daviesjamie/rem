@@ -10,6 +10,7 @@ class RootAlreadyExists(Exception):
         super(RootAlreadyExists, self).__init__()
         self.path = path
 
+
 class RootNotFound(Exception):
     pass
 
@@ -43,6 +44,16 @@ class TaskList(object):
         self.tasks = {}
         self.done = {}
 
+        filemap = (('tasks', 'tasks'), ('completed', 'completed'))
+        for kind, filename in filemap:
+            path = os.path.join(self.root, filename)
+            if os.path.exists(path):
+                with open(path, 'r') as task_file:
+                    task_lines = [tl.strip() for tl in task_file if tl]
+                    tasks = map(_task_from_taskline, task_lines)
+                    for task in tasks:
+                        if task is not None:
+                            getattr(self, kind)[task['id']] = task
 
 def _build_parser():
     parser = argparse.ArgumentParser()
@@ -85,20 +96,21 @@ def _main():
     args, text = _build_parser().parse_known_args()
 
     try:
-        tasks = TaskList()
-
         if args.init:
             _create_root()
-        elif args.complete:
-            print 'complete', args.complete
-        elif args.remove:
-            print 'remove', args.remove
-        elif args.edit:
-            print 'edit', args.edit
-        elif text:
-            print 'new', text
         else:
-            print 'list', args.grep, args.detailed, args.simple, args.completed
+            tasks = TaskList()
+
+            if args.complete:
+                print 'complete', args.complete
+            elif args.remove:
+                print 'remove', args.remove
+            elif args.edit:
+                print 'edit', args.edit
+            elif text:
+                print 'new', text
+            else:
+                print 'list', args.grep, args.detailed, args.simple, args.completed
 
     except RootNotFound:
         sys.stderr.write('Error: No task root could be found.\nTry using {0} --init first.\n'.format(sys.argv[0]))
