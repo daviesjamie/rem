@@ -5,8 +5,10 @@ from operator import itemgetter
 
 from .exceptions import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix
 
+FOLDER_NAME = '.todor'
+
 def _create_root():
-    root_path = os.path.join(os.getcwd(), '.rem')
+    root_path = os.path.join(os.getcwd(), FOLDER_NAME)
 
     if os.path.exists(root_path):
         raise RootAlreadyExists(root_path)
@@ -18,14 +20,14 @@ def _create_root():
 def _get_root_path():
     dir_path = os.getcwd()
 
-    while(not os.path.exists(os.path.join(dir_path, '.rem'))):
+    while(not os.path.exists(os.path.join(dir_path, FOLDER_NAME))):
         new_path = os.path.dirname(dir_path)
         if new_path == dir_path:
             raise RootNotFound
 
         dir_path = os.path.dirname(dir_path)
 
-    return os.path.join(dir_path, '.rem')
+    return os.path.join(dir_path, FOLDER_NAME)
 
 def _hash(text):
     return hashlib.sha1(text).hexdigest()

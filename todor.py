@@ -4,73 +4,70 @@ import argparse
 import sys
 
 from todor.exceptions import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix
+from todor.helpers import _create_root
 from todor.tasklist import TaskList
 
 def _build_parser():
     parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest='command')
 
-    # ACTIONS
-    ##########
-    actions = parser.add_argument_group('Actions')
+    # Initialise task list
+    init = subparsers.add_parser('init')
 
-    # Initialise task file
-    actions.add_argument('--init', dest='init', action='store_true')
+    # Add a new task
+    add = subparsers.add_parser('add')
 
     # Edit a task
-    actions.add_argument('-e', '--edit', dest='edit', metavar='TASK HASH')
+    edit = subparsers.add_parser('edit')
+    edit.add_argument('prefix')
 
     # Complete a task
-    actions.add_argument('-c', '--complete', dest='complete', metavar='TASK HASH')
+    done = subparsers.add_parser('done')
+    done.add_argument('prefix')
 
     # Delete a task
-    actions.add_argument('-rm', '--remove', dest='remove', metavar='TASK HASH')
+    rm = subparsers.add_parser('rm')
+    rm.add_argument('prefix')
 
-    # OUTPUT OPTIONS
-    #################
-    output = parser.add_argument_group('Output Options')
-
-    # Grep for a task
-    output.add_argument('-g', '--grep', dest='grep', metavar='SEARCH TERM(S)', default='')
-
-    # Detailed task listing
-    output.add_argument('-l', '--long', dest='detailed', action='store_true')
-
-    # Simple task listing
-    output.add_argument('-s', '--simple', dest='simple', action='store_true')
-
-    # List completed tasks
-    output.add_argument('--completed', dest='kind', action='store_const', const='completed', default='tasks')
+    # List tasks
+    ls = subparsers.add_parser('ls')
+    ls.add_argument('-g', '--grep', dest='grep', default='')
+    ls.add_argument('-l', '--long', dest='long', action='store_true')
+    ls.add_argument('-s', '--short', dest='short', action='store_true')
+    ls.add_argument('-d', '--done', dest='kind', action='store_const', const='done', default='tasks')
 
     return parser
 
 def _main():
-    args, text = _build_parser().parse_known_args()
+    parser = _build_parser()
+    args, text = parser.parse_known_args()
     text = ' '.join(text).strip()
 
     try:
-        if args.init:
+        if args.command == 'init':
             _create_root()
+
         else:
-            task_list = TaskList()
+            tl = TaskList()
 
-            if args.complete:
-                task_list.finish(args.complete)
-                task_list.write()
+            if args.command == 'add':
+                tl.add(text)
+                tl.write()
 
-            elif args.remove:
-                task_list.remove(args.remove)
-                task_list.write()
+            elif args.command == 'edit':
+                tl.edit(args.prefix, text)
+                tl.write()
 
-            elif args.edit:
-                task_list.edit(args.edit, text)
-                task_list.write()
+            elif args.command == 'done':
+                tl.finish(args.prefix)
+                tl.write()
 
-            elif text:
-                task_list.add(text)
-                task_list.write()
+            elif args.command == 'rm':
+                tl.remove(args.prefix)
+                tl.write()
 
-            else:
-                task_list.print_list(kind=args.kind, grep=args.grep, detailed=args.detailed, simple=args.simple)
+            elif args.command == 'ls':
+                tl.print_list(kind=args.kind, grep=args.grep, long=args.long, short=args.short)
 
     except RootNotFound:
         sys.stderr.write('Error: No task root could be found.\nTry using {0} --init first.\n'.format(sys.argv[0]))

@@ -3,16 +3,16 @@ import re
 from operator import itemgetter
 
 from .exceptions import UnknownPrefix, AmbiguousPrefix
-from helpers import _get_root_path, _prefixes, _task_from_taskline, _tasklines_from_tasks
+from helpers import _get_root_path, _hash, _prefixes, _task_from_taskline, _tasklines_from_tasks
 
 
 class TaskList(object):
     def __init__(self):
         self.root = _get_root_path()
         self.tasks = {}
-        self.completed = {}
+        self.done = {}
 
-        filemap = (('tasks', 'tasks'), ('completed', 'completed'))
+        filemap = (('tasks', 'tasks'), ('done', 'done'))
         for kind, filename in filemap:
             path = os.path.join(self.root, filename)
             if os.path.exists(path):
@@ -52,16 +52,16 @@ class TaskList(object):
 
     def finish(self, prefix):
         task = self.tasks.pop(self[prefix]['id'])
-        self.completed[task['id']] = task
+        self.done[task['id']] = task
 
     def remove(self, prefix):
         self.tasks.pop(self[prefix]['id'])
 
-    def print_list(self,kind='tasks', grep='', detailed=False, simple=False):
+    def print_list(self,kind='tasks', grep='', long=False, short=False):
         tasks = getattr(self, kind)
-        label = 'prefix' if not detailed else 'id'
+        label = 'prefix' if not long else 'id'
 
-        if not detailed:
+        if not long:
             for task_id, prefix in _prefixes(tasks).iteritems():
                 tasks[task_id]['prefix'] = prefix
 
@@ -69,11 +69,11 @@ class TaskList(object):
 
         for _, task in sorted(tasks.iteritems()):
             if grep.lower() in task['text'].lower():
-                l = '{0} - '.format(task[label].ljust(label_length)) if not simple else ''
+                l = '{0} - '.format(task[label].ljust(label_length)) if not short else ''
                 print l + task['text']
 
     def write(self):
-        filemap = (('tasks', 'tasks'), ('completed', 'completed'))
+        filemap = (('tasks', 'tasks'), ('done', 'done'))
         for kind, filename in filemap:
             path = os.path.join(self.root, filename)
             tasks = sorted(getattr(self, kind).values(), key=itemgetter('id'))
