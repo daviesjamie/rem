@@ -82,6 +82,14 @@ def _task_from_taskline(taskline):
     text = taskline.strip()
     return { 'id': _hash(text), 'text': text }
 
+def _tasklines_from_tasks(tasks):
+    tasklines = []
+
+    for task in tasks:
+        tasklines.append(task['text'])
+
+    return tasklines
+
 
 class TaskList(object):
     def __init__(self):
