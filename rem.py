@@ -99,6 +99,10 @@ class TaskList(object):
                         if task is not None:
                             getattr(self, kind)[task['id']] = task
 
+    def add_task(self, text):
+        task_id = _hash(text)
+        self.tasks[task_id] = { 'id': task_id, 'text': text }
+
     def print_list(self,kind='tasks', grep='', detailed=False, simple=False):
         tasks = getattr(self, kind)
         label = 'prefix' if not detailed else 'id'
@@ -168,7 +172,7 @@ def _main():
             elif args.edit:
                 print 'edit', args.edit
             elif text:
-                print 'new', text
+                task_list.add(text)
             else:
                 task_list.print_list(kind=args.kind, grep=args.grep, detailed=args.detailed, simple=args.simple)
 
