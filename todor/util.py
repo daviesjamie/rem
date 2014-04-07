@@ -27,6 +27,10 @@ def get_root_path():
 
     return os.path.join(dir_path, FOLDER_NAME)
 
+def get_system_editor():
+    editor = 'vi'
+    return (os.environ.get('VISUAL') or os.environ.get('EDITOR') or editor
+
 def hash(text):
     return hashlib.sha1(text).hexdigest()
 
