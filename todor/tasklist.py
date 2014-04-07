@@ -3,12 +3,12 @@ import re
 from operator import itemgetter
 
 from util import UnknownPrefix, AmbiguousPrefix
-from util import _get_root_path, _hash, _prefixes, _task_from_taskline, _tasklines_from_tasks
+from util import get_root_path, hash, prefixes, task_from_taskline, tasklines_from_tasks
 
 
 class TaskList(object):
     def __init__(self):
-        self.root = _get_root_path()
+        self.root = get_root_path()
         self.tasks = {}
         self.done = {}
 
@@ -18,7 +18,7 @@ class TaskList(object):
             if os.path.exists(path):
                 with open(path, 'r') as task_file:
                     task_lines = [tl.strip() for tl in task_file if tl]
-                    tasks = map(_task_from_taskline, task_lines)
+                    tasks = map(task_from_taskline, task_lines)
                     for task in tasks:
                         if task is not None:
                             getattr(self, kind)[task['id']] = task
@@ -37,7 +37,7 @@ class TaskList(object):
                 raise AmbiguousPrefix(prefix)
 
     def add(self, text):
-        task_id = _hash(text)
+        task_id = hash(text)
         self.tasks[task_id] = { 'id': task_id, 'text': text }
 
     def edit(self, prefix, text):
@@ -62,7 +62,7 @@ class TaskList(object):
         label = 'prefix' if not long else 'id'
 
         if not long:
-            for task_id, prefix in _prefixes(tasks).iteritems():
+            for task_id, prefix in prefixes(tasks).iteritems():
                 tasks[task_id]['prefix'] = prefix
 
         label_length = max(map(lambda t: len(t[label]), tasks.values())) if tasks else 0
@@ -78,5 +78,5 @@ class TaskList(object):
             path = os.path.join(self.root, filename)
             tasks = sorted(getattr(self, kind).values(), key=itemgetter('id'))
             with open(path, 'w') as task_file:
-                for taskline in _tasklines_from_tasks(tasks):
+                for taskline in tasklines_from_tasks(tasks):
                     task_file.write(taskline)

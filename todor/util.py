@@ -5,7 +5,7 @@ from operator import itemgetter
 
 FOLDER_NAME = '.todor'
 
-def _create_root():
+def create_root():
     root_path = os.path.join(os.getcwd(), FOLDER_NAME)
 
     if os.path.exists(root_path):
@@ -15,7 +15,7 @@ def _create_root():
     open(os.path.join(root_path, 'tasks'), 'a').close()
     open(os.path.join(root_path, 'completed'), 'a').close()
 
-def _get_root_path():
+def get_root_path():
     dir_path = os.getcwd()
 
     while(not os.path.exists(os.path.join(dir_path, FOLDER_NAME))):
@@ -27,10 +27,10 @@ def _get_root_path():
 
     return os.path.join(dir_path, FOLDER_NAME)
 
-def _hash(text):
+def hash(text):
     return hashlib.sha1(text).hexdigest()
 
-def _prefixes(ids):
+def prefixes(ids):
     prefixes = {}
     for id in ids:
         id_len = len(id)
@@ -61,15 +61,15 @@ def _prefixes(ids):
 
     return prefixes
 
-def _task_from_taskline(taskline):
+def task_from_taskline(taskline):
     text = taskline.strip()
 
     if text == '' or text.startswith('#'):
         return None
 
-    return { 'id': _hash(text), 'text': text }
+    return { 'id': hash(text), 'text': text }
 
-def _tasklines_from_tasks(tasks):
+def tasklines_from_tasks(tasks):
     tasklines = []
 
     for task in tasks:
