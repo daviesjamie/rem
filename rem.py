@@ -95,7 +95,7 @@ class TaskList(object):
     def __init__(self):
         self.root = _get_root_path()
         self.tasks = {}
-        self.done = {}
+        self.completed = {}
 
         filemap = (('tasks', 'tasks'), ('completed', 'completed'))
         for kind, filename in filemap:
@@ -108,7 +108,7 @@ class TaskList(object):
                         if task is not None:
                             getattr(self, kind)[task['id']] = task
 
-    def add_task(self, text):
+    def add(self, text):
         task_id = _hash(text)
         self.tasks[task_id] = { 'id': task_id, 'text': text }
 
@@ -135,7 +135,7 @@ class TaskList(object):
             if tasks:
                 with open(path, 'w') as task_file:
                     for taskline in _tasklines_from_tasks(tasks):
-                        task_file.write(taskline)
+                        task_file.write('{0}\n'.format(taskline))
 
 
 def _build_parser():
@@ -171,12 +171,13 @@ def _build_parser():
     output.add_argument('-s', '--simple', dest='simple', action='store_true')
 
     # List completed tasks
-    output.add_argument('--completed', dest='kind', action='store_const', const='done', default='tasks')
+    output.add_argument('--completed', dest='kind', action='store_const', const='completed', default='tasks')
 
     return parser
 
 def _main():
     args, text = _build_parser().parse_known_args()
+    text = ' '.join(text).strip()
 
     try:
         if args.init:
@@ -192,6 +193,7 @@ def _main():
                 print 'edit', args.edit
             elif text:
                 task_list.add(text)
+                task_list.write()
             else:
                 task_list.print_list(kind=args.kind, grep=args.grep, detailed=args.detailed, simple=args.simple)
 
