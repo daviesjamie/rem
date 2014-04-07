@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import os
 import sys
+from operator import itemgetter
 
 
 class RootAlreadyExists(Exception):
@@ -117,6 +118,16 @@ class TaskList(object):
             if grep.lower() in task['text'].lower():
                 l = '{0} - '.format(task[label].ljust(label_length)) if not simple else ''
                 print l + task['text']
+
+    def write(self):
+        filemap = (('tasks', 'tasks'), ('completed', 'completed'))
+        for kind, filename in filemap:
+            path = os.path.join(self.root, filename)
+            tasks = sorted(getattr(self, kind).values(), key=itemgetter('id'))
+            if tasks:
+                with open(path, 'w') as task_file:
+                    for taskline in _tasklines_from_tasks(tasks):
+                        task_file.write(taskline)
 
 
 def _build_parser():
