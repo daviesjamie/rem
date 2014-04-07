@@ -87,10 +87,9 @@ def _prefixes(ids):
 def _task_from_taskline(taskline):
     text = taskline.strip()
 
-    if text.startswith('#'):
+    if text == '' or text.startswith('#'):
         return None
 
-    text = taskline.strip()
     return { 'id': _hash(text), 'text': text }
 
 def _tasklines_from_tasks(tasks):
