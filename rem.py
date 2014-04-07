@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import os
+import re
 import sys
 from operator import itemgetter
 
@@ -135,6 +136,16 @@ class TaskList(object):
         task_id = _hash(text)
         self.tasks[task_id] = { 'id': task_id, 'text': text }
 
+    def edit(self, prefix, text):
+        task = self[prefix]
+
+        if text.startswith('s/') or text.startswith('/'):
+            text = re.sub('^s?/', '', text).rstrip('/')
+            find, _, repl = text.partition('/')
+            text = re.sub(find, repl, task['text'])
+
+        task['text'] = text
+
     def finish(self, prefix):
         task = self.tasks.pop(self[prefix]['id'])
         self.completed[task['id']] = task
@@ -223,7 +234,8 @@ def _main():
                 task_list.write()
 
             elif args.edit:
-                print 'edit', args.edit
+                task_list.edit(args.edit, text)
+                task_list.write()
 
             elif text:
                 task_list.add(text)
