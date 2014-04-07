@@ -96,7 +96,7 @@ def _tasklines_from_tasks(tasks):
     tasklines = []
 
     for task in tasks:
-        tasklines.append(task['text'])
+        tasklines.append('{0}\n'.format(task['text']))
 
     return tasklines
 
@@ -135,6 +135,13 @@ class TaskList(object):
         task_id = _hash(text)
         self.tasks[task_id] = { 'id': task_id, 'text': text }
 
+    def finish(self, prefix):
+        task = self.tasks.pop(self[prefix]['id'])
+        self.completed[task['id']] = task
+
+    def remove(self, prefix):
+        self.tasks.pop(self[prefix]['id'])
+
     def print_list(self,kind='tasks', grep='', detailed=False, simple=False):
         tasks = getattr(self, kind)
         label = 'prefix' if not detailed else 'id'
@@ -155,10 +162,9 @@ class TaskList(object):
         for kind, filename in filemap:
             path = os.path.join(self.root, filename)
             tasks = sorted(getattr(self, kind).values(), key=itemgetter('id'))
-            if tasks:
-                with open(path, 'w') as task_file:
-                    for taskline in _tasklines_from_tasks(tasks):
-                        task_file.write('{0}\n'.format(taskline))
+            with open(path, 'w') as task_file:
+                for taskline in _tasklines_from_tasks(tasks):
+                    task_file.write(taskline)
 
 
 def _build_parser():
@@ -209,14 +215,20 @@ def _main():
             task_list = TaskList()
 
             if args.complete:
-                print 'complete', args.complete
+                task_list.finish(args.complete)
+                task_list.write()
+
             elif args.remove:
-                print 'remove', args.remove
+                task_list.remove(args.remove)
+                task_list.write()
+
             elif args.edit:
                 print 'edit', args.edit
+
             elif text:
                 task_list.add(text)
                 task_list.write()
+
             else:
                 task_list.print_list(kind=args.kind, grep=args.grep, detailed=args.detailed, simple=args.simple)
 
@@ -225,6 +237,12 @@ def _main():
 
     except RootAlreadyExists, e:
         sys.stderr.write('Error: The task root at {0} already exists!\n'.format(e.path))
+
+    except UnknownPrefix, e:
+        sys.stderr.write('Error: The prefix "{0}" does not match any tasks!\n'.format(e.prefix))
+
+    except AmbiguousPrefix, e:
+        sys.stderr.write('Error: The prefix "{0}" is ambiguous, it matches more than one task!\n'.format(e.prefix))
 
 if __name__ == '__main__':
     _main()
