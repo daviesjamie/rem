@@ -3,8 +3,8 @@
 import argparse
 import sys
 
-from tasklist.exceptions import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix
-from tasklist.tasklist import TaskList
+from todor.exceptions import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix
+from todor.tasklist import TaskList
 
 def _build_parser():
     parser = argparse.ArgumentParser()
