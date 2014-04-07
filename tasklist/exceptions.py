@@ -9,13 +9,13 @@ class RootNotFound(Exception):
 
 
 class UnknownPrefix(Exception):
-   def __init(self, prefix):
+   def __init__(self, prefix):
         super(UnknownPrefix, self).__init__()
         self.prefix = prefix
 
 
 class AmbiguousPrefix(Exception):
-    def __init(self, prefix):
+    def __init__(self, prefix):
         super(AmbiguousPrefix, self).__init__()
         self.prefix = prefix
 
