@@ -23,11 +23,11 @@ def _build_parser():
 
     # Complete a task
     done = subparsers.add_parser('done')
-    done.add_argument('prefix')
+    done.add_argument('prefixes', nargs='+')
 
     # Delete a task
     rm = subparsers.add_parser('rm')
-    rm.add_argument('prefix')
+    rm.add_argument('prefixes', nargs='+')
 
     # List tasks
     ls = subparsers.add_parser('ls')
@@ -59,11 +59,13 @@ def _main():
                 tl.write()
 
             elif args.command == 'done':
-                tl.finish(args.prefix)
+                for prefix in args.prefixes:
+                    tl.finish(prefix)
                 tl.write()
 
             elif args.command == 'rm':
-                tl.remove(args.prefix)
+                for prefix in args.prefixes:
+                    tl.remove(prefix)
                 tl.write()
 
             elif args.command == 'ls':
