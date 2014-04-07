@@ -2,8 +2,8 @@ import os
 import re
 from operator import itemgetter
 
-from .exceptions import UnknownPrefix, AmbiguousPrefix
-from helpers import _get_root_path, _hash, _prefixes, _task_from_taskline, _tasklines_from_tasks
+from util import UnknownPrefix, AmbiguousPrefix
+from util import _get_root_path, _hash, _prefixes, _task_from_taskline, _tasklines_from_tasks
 
 
 class TaskList(object):

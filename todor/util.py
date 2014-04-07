@@ -3,8 +3,6 @@ import os
 import re
 from operator import itemgetter
 
-from .exceptions import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix
-
 FOLDER_NAME = '.todor'
 
 def _create_root():
@@ -78,3 +76,25 @@ def _tasklines_from_tasks(tasks):
         tasklines.append('{0}\n'.format(task['text']))
 
     return tasklines
+
+
+class RootAlreadyExists(Exception):
+    def __init__(self, path):
+        super(RootAlreadyExists, self).__init__()
+        self.path = path
+
+
+class RootNotFound(Exception):
+    pass
+
+
+class UnknownPrefix(Exception):
+   def __init__(self, prefix):
+        super(UnknownPrefix, self).__init__()
+        self.prefix = prefix
+
+
+class AmbiguousPrefix(Exception):
+    def __init__(self, prefix):
+        super(AmbiguousPrefix, self).__init__()
+        self.prefix = prefix

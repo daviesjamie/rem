@@ -3,9 +3,8 @@
 import argparse
 import sys
 
-from todor.exceptions import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix
-from todor.helpers import _create_root
 from todor.tasklist import TaskList
+from todor.utils import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix, _create_root
 
 def _build_parser():
     parser = argparse.ArgumentParser()
