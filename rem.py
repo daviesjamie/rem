@@ -17,6 +17,17 @@ class RootNotFound(Exception):
     pass
 
 
+class UnknownPrefix(Exception):
+    def __init(self, prefix):
+        super(UnknownPrefix, self).__init__()
+        self.prefix = prefix
+
+
+class AmbiguousPrefix(Exception):
+    def __init(self, prefix):
+        super(AmbiguousPrefix, self).__init__()
+        self.prefix = prefix
+
 def _create_root():
     root_path = os.path.join(os.getcwd(), '.rem')
 
@@ -107,6 +118,19 @@ class TaskList(object):
                     for task in tasks:
                         if task is not None:
                             getattr(self, kind)[task['id']] = task
+
+    def __getitem__(self, prefix):
+        matched = filter(lambda tid: tid.startswith(prefix), self.tasks.keys())
+        if len(matched) == 1:
+            return self.tasks[matched[0]]
+        elif len(matched) == 0:
+            raise UnknownPrefix(prefix)
+        else:
+            matched = filter(lambda tid: tid == prefix, self.tasks.keys())
+            if len(matched) == 1:
+                return self.tasks[matched[0]]
+            else:
+                raise AmbiguousPrefix(prefix)
 
     def add(self, text):
         task_id = _hash(text)
