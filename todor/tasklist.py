@@ -37,8 +37,9 @@ class TaskList(object):
                 raise AmbiguousPrefix(prefix)
 
     def add(self, text):
-        task_id = hash(text)
-        self.tasks[task_id] = { 'id': task_id, 'text': text }
+        task = task_from_taskline(text)
+        if task:
+            self.tasks[task['id']] = task
 
     def edit(self, prefix, text):
         task = self[prefix]

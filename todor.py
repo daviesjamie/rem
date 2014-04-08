@@ -4,7 +4,7 @@ import argparse
 import sys
 
 from todor.tasklist import TaskList
-from todor.utils import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix, _create_root
+from todor.utils import RootAlreadyExists, RootNotFound, UnknownPrefix, AmbiguousPrefix, create_root, temp_edit
 
 def _build_parser():
     parser = argparse.ArgumentParser()
@@ -15,6 +15,7 @@ def _build_parser():
 
     # Add a new task
     add = subparsers.add_parser('add')
+    add.add_argument('-f', '--file', dest='file', nargs='?', const='TEMPORARY_EDIT_FILE')
 
     # Edit a task
     edit = subparsers.add_parser('edit')
@@ -50,7 +51,23 @@ def _main():
             tl = TaskList()
 
             if args.command == 'add':
-                tl.add(text)
+                if args.file:
+                    if args.file == 'TEMPORARY_EDIT_FILE':
+                        template = []
+                        template.append("")
+                        template.append("# Enter your todo tasks here.")
+                        template.append("# Each line will be treated as a separate task.")
+                        template.append("# Lines starting with a # will be ignored.")
+                        template.append("#")
+                        template.append("# Todor, todor? TODOR!")
+
+                        tasklines = temp_edit("\n".join(template)).splitlines()
+
+                        for taskline in tasklines:
+                            tl.add(taskline)
+                else:
+                    tl.add(text)
+
                 tl.write()
 
             elif args.command == 'edit':

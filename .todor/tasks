@@ -1,7 +1,9 @@
 Add `status` command
+Add ability to load tasks from an arbitrary file
 Write a useful README file
 Make rm work on done tasks too.
-Support multiple adding -- each line is a separate task
+Add ability to edit task file directly
+Fix system editor bug
 Write docstrings/documentation
 Write useful help/usage messages
 Add support for aliases, like git

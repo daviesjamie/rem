@@ -1,6 +1,8 @@
 import hashlib
 import os
 import re
+import subprocess
+import tempfile
 from operator import itemgetter
 
 FOLDER_NAME = '.todor'
@@ -28,8 +30,9 @@ def get_root_path():
     return os.path.join(dir_path, FOLDER_NAME)
 
 def get_system_editor():
-    editor = 'vi'
-    return (os.environ.get('VISUAL') or os.environ.get('EDITOR') or editor
+    #editor = 'vi'
+    #return (os.environ.get('VISUAL') or os.environ.get('EDITOR') or editor)
+    return 'vim'
 
 def hash(text):
     return hashlib.sha1(text).hexdigest()
@@ -80,6 +83,25 @@ def tasklines_from_tasks(tasks):
         tasklines.append('{0}\n'.format(task['text']))
 
     return tasklines
+
+def temp_edit(text):
+    (fd, name) = tempfile.mkstemp(prefix="todor-editor-", suffix=".txt", text=True)
+
+    try:
+        f = os.fdopen(fd, 'w')
+        f.write(text)
+        f.close()
+
+        editor = get_system_editor()
+        subprocess.check_call('{0} "{1}"'.format(editor, name), shell=True)
+
+        f = open(name)
+        t = f.read()
+        f.close()
+    finally:
+        os.unlink(name)
+
+    return t
 
 
 class RootAlreadyExists(Exception):
