@@ -15,7 +15,7 @@ def create_root():
 
     os.mkdir(root_path)
     open(os.path.join(root_path, 'tasks'), 'a').close()
-    open(os.path.join(root_path, 'completed'), 'a').close()
+    open(os.path.join(root_path, 'done'), 'a').close()
 
 def get_root_path():
     dir_path = os.getcwd()
