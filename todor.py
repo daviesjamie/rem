@@ -45,7 +45,7 @@ def _main():
 
     try:
         if args.command == 'init':
-            _create_root()
+            create_root()
 
         else:
             tl = TaskList()
