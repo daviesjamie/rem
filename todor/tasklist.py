@@ -70,7 +70,7 @@ class TaskList(object):
 
         for _, task in sorted(tasks.iteritems()):
             if grep.lower() in task['text'].lower():
-                l = '{0} - '.format(task[label].ljust(label_length)) if not short else ''
+                l = '{0} - '.format(task[label].rjust(label_length)) if not short else ''
                 print l + task['text']
 
     def write(self):
