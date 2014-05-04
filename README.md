@@ -6,8 +6,10 @@ Todor
 Todor is a simple Python tool that enables you to create plain-text todo lists
 on a per-project basis. Think of it as Git for your todos.
 
-![Example
-workflow](https://github.com/daviesjamie/todor/raw/master/workflow.png)
+<p align=center>
+    <img src="https://github.com/daviesjamie/todor/raw/master/workflow.png"
+    alt="Example workflow" />
+</p>
 
 ## Installation
 
